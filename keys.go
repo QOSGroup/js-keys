@@ -2,36 +2,97 @@ package main
 
 import (
 	"crypto/hmac"
+	"crypto/sha256"
 	"crypto/sha512"
+	"encoding/base64"
 	"encoding/binary"
 	"errors"
 	"fmt"
 	"github.com/gopherjs/gopherjs/js"
+	"golang.org/x/crypto/ed25519"
 	"math/big"
 	"strconv"
 	"strings"
 
 	"github.com/btcsuite/btcd/btcec"
 	"github.com/btcsuite/btcutil/bech32"
+	"github.com/tyler-smith/go-bip39"
 )
 
 func main() {
 
 	js.Global.Set("keys", map[string]interface{}{
-		"Bech32ifyQOSAccAddress":  Bech32ifyQOSAccAddress,
-		"Bech32ifyQOSAccPubkey":   Bech32ifyQOSAccPubkey,
-		"DeriveQOSPrivateKeySeed": DeriveQOSPrivateKeySeed,
-		"ComputeMastersFromSeed":  ComputeMastersFromSeed,
-		"DerivePrivateKeyForPath": DerivePrivateKeyForPath,
+		"Bech32ifyQOSAccPubkeyFromBase64PubKey":  Bech32ifyQOSAccPubkeyFromBase64PubKey,
+		"Bech32ifyQOSAccAddressFromBase64PubKey": Bech32ifyQOSAccAddressFromBase64PubKey,
+		"Bech32ifyQOSAccAddressFromPubKey":       Bech32ifyQOSAccAddressFromPubKey,
+		"Bech32ifyQOSAccAddress":                 Bech32ifyQOSAccAddress,
+		"Bech32ifyQOSAccPubKey":                  Bech32ifyQOSAccPubKey,
+		"DecodeBase64":                           DecodeBase64,
+		"EncodeBase64":                           EncodeBase64,
+		"DeriveKey":                              DeriveKey,
+		"DeriveQOSKey":                           DeriveQOSKey,
+		"AddressFromPubKey":                      AddressFromPubKey,
 	})
+}
+
+func DeriveQOSKey(mnemonic string) ([]byte, []byte, error) {
+	return DeriveKey(mnemonic, "44'/389'/0'/0/0")
+}
+
+func DeriveKey(mnemonic, hdpath string) (priKeyBz []byte, pubKeyBz []byte, err error) {
+	seed, err := bip39.NewSeedWithErrorChecking(mnemonic, "")
+	if err != nil {
+		return nil, nil, err
+	}
+
+	secret, chaincode := computeMastersFromSeed(seed)
+	privateKeySeed, err := derivePrivateKeyForPath(secret, chaincode, hdpath)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	hasher := sha256.New()
+	hasher.Write(privateKeySeed[:])
+	hash256Seed := hasher.Sum(nil)
+
+	priKey := ed25519.NewKeyFromSeed(hash256Seed)
+	return priKey, priKey[32:], nil
+}
+
+func Bech32ifyQOSAccPubkeyFromBase64PubKey(base64pubkey string) (string, error) {
+	bz, err := base64.StdEncoding.DecodeString(base64pubkey)
+	if err != nil {
+		return "", err
+	}
+	return Bech32ifyQOSAccPubKey(bz)
+}
+
+func Bech32ifyQOSAccPubKey(pubkey []byte) (string, error) {
+	return ConvertAndEncode("qosaccpub", pubkey)
+}
+
+func Bech32ifyQOSAccAddressFromBase64PubKey(base64pubkey string) (string, error) {
+	bz, err := base64.StdEncoding.DecodeString(base64pubkey)
+	if err != nil {
+		return "", err
+	}
+	return Bech32ifyQOSAccAddressFromPubKey(bz)
+}
+
+func Bech32ifyQOSAccAddressFromPubKey(pubkey []byte) (string, error) {
+	return Bech32ifyQOSAccAddress(AddressFromPubKey(pubkey))
 }
 
 func Bech32ifyQOSAccAddress(addr []byte) (string, error) {
 	return ConvertAndEncode("qosacc", addr)
 }
 
-func Bech32ifyQOSAccPubkey(pubkey []byte) (string, error) {
-	return ConvertAndEncode("qosaccpub", pubkey)
+func DecodeBase64(str string) ([]byte, error) {
+	return base64.StdEncoding.DecodeString(str)
+}
+
+func EncodeBase64(bz []byte) string {
+	return base64.StdEncoding.EncodeToString(bz)
 }
 
 func ConvertAndEncode(hrp string, data []byte) (string, error) {
@@ -43,13 +104,12 @@ func ConvertAndEncode(hrp string, data []byte) (string, error) {
 
 }
 
-func DeriveQOSPrivateKeySeed(seed []byte) ([32]byte, error) {
-	secret, chaincode := ComputeMastersFromSeed(seed)
-	return DerivePrivateKeyForPath(secret, chaincode, "44'/389'/0'/0/0")
+func AddressFromPubKey(bz []byte) []byte {
+	hash := sha256.Sum256(bz)
+	return hash[:20]
 }
 
-// ComputeMastersFromSeed returns the master public key, master secret, and chain code in hex.
-func ComputeMastersFromSeed(seed []byte) (secret [32]byte, chainCode [32]byte) {
+func computeMastersFromSeed(seed []byte) (secret [32]byte, chainCode [32]byte) {
 
 	masterSecret := []byte("Bitcoin seed")
 	secret, chainCode = i64(masterSecret, seed)
@@ -57,15 +117,11 @@ func ComputeMastersFromSeed(seed []byte) (secret [32]byte, chainCode [32]byte) {
 	return
 }
 
-// DerivePrivateKeyForPath derives the private key by following the BIP 32/44 path from privKeyBytes,
-// using the given chainCode.
-func DerivePrivateKeyForPath(privKeyBytes [32]byte, chainCode [32]byte, path string) ([32]byte, error) {
+func derivePrivateKeyForPath(privKeyBytes [32]byte, chainCode [32]byte, path string) ([32]byte, error) {
 	data := privKeyBytes
 	parts := strings.Split(path, "/")
 	for _, part := range parts {
-		// do we have an apostrophe?
 		harden := part[len(part)-1:] == "'"
-		// harden == private derivation, else public derivation:
 		if harden {
 			part = part[:len(part)-1]
 		}
@@ -87,27 +143,16 @@ func DerivePrivateKeyForPath(privKeyBytes [32]byte, chainCode [32]byte, path str
 	return derivedKey, nil
 }
 
-// derivePrivateKey derives the private key with index and chainCode.
-// If harden is true, the derivation is 'hardened'.
-// It returns the new private key and new chain code.
-// For more information on hardened keys see:
-//  - https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki
 func derivePrivateKey(privKeyBytes [32]byte, chainCode [32]byte, index uint32, harden bool) ([32]byte, [32]byte) {
 	var data []byte
 	if harden {
 		index = index | 0x80000000
 		data = append([]byte{byte(0)}, privKeyBytes[:]...)
 	} else {
-		// this can't return an error:
 		_, ecPub := btcec.PrivKeyFromBytes(btcec.S256(), privKeyBytes[:])
 		pubkeyBytes := ecPub.SerializeCompressed()
 		data = pubkeyBytes
 
-		/* By using btcec, we can remove the dependency on tendermint/crypto/secp256k1
-		pubkey := secp256k1.PrivKeySecp256k1(privKeyBytes).PubKey()
-		public := pubkey.(secp256k1.PubKeySecp256k1)
-		data = public[:]
-		*/
 	}
 	data = append(data, uint32ToBytes(index)...)
 	data2, chainCode2 := i64(chainCode[:], data)

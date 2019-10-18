@@ -1,6 +1,6 @@
 {
   "name": "keys",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "operation for QOS keys",
   "main": "keys.js",
   "scripts": {
