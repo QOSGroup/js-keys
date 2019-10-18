@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>test</title>
+    <script type="application/javascript" src="./keys.js" ></script>
+</head>
+<body>
+
+</body>
+
+<script type="application/javascript">
+
+    //seed from Mnemonic
+    let seed = [241,96,71,114,44,235,135,242,13,155,91,7,95,96,100,44,131,238,61,190,214,154,109,120,79,206,76,243,20,147,69,169,46,26,250,202,178,234,172,247,21,125,192,68,22,94,16,59,157,56,150,159,220,214,44,62,18,51,78,237,171,3,111,168];
+
+    //从助记词中获取私钥种子
+    let [privateSeed, err] =  keys.DeriveQOSPrivateKeySeed(seed);
+
+    if (err != null) {
+        console.log(err);
+    }
+
+    console.log(privateSeed);
+
+
+    //pubkey bech32ify
+
+    //base64: FiTeZCCUOiYMsR76i7TWTgWw0sk51TXSuGWkHFVBH4EDBKlTNw==
+    let pubkey = [22,36,222,100,32,148,58,38,12,177,30,250,139,180,214,78,5,176,210,201,57,213,53,210,184,101,164,28,85,65,31,129,3,4,169,83,55];
+
+    //pubkey以bech32格式显示
+    let [bech32pubkey, err2] = keys.Bech32ifyQOSAccPubkey(pubkey);
+
+    if(err2 != null) {
+        console.log(err2);
+    }
+
+    console.log(bech32pubkey);
+
+    //address bech32ify
+
+    //base64: 1Hb3OVQn2n0McIPZNfYTriHlEpM=
+    let addr = [212,118,247,57,84,39,218,125,12,112,131,217,53,246,19,174,33,229,18,147];
+
+    //用户地址以bech32格式显示
+    let [bech32addr, err3] = keys.Bech32ifyQOSAccAddress(addr);
+
+    if(err3 != null) {
+        console.log(err3);
+    }
+
+    console.log(bech32addr);
+
+
+</script>
+
+</html>
