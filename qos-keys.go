@@ -21,7 +21,7 @@ import (
 
 func main() {
 
-	js.Global.Set("keys", map[string]interface{}{
+	js.Global.Set("qosKeys", map[string]interface{}{
 		"Bech32ifyQOSAccPubkeyFromBase64PubKey":  Bech32ifyQOSAccPubkeyFromBase64PubKey,
 		"Bech32ifyQOSAccAddressFromBase64PubKey": Bech32ifyQOSAccAddressFromBase64PubKey,
 		"Bech32ifyQOSAccAddressFromPubKey":       Bech32ifyQOSAccAddressFromPubKey,
@@ -32,6 +32,7 @@ func main() {
 		"DeriveKey":                              DeriveKey,
 		"DeriveQOSKey":                           DeriveQOSKey,
 		"AddressFromPubKey":                      AddressFromPubKey,
+		"Sign": 								  Sign,
 	})
 }
 
@@ -57,6 +58,12 @@ func DeriveKey(mnemonic, hdpath string) (priKeyBz []byte, pubKeyBz []byte, err e
 
 	priKey := ed25519.NewKeyFromSeed(hash256Seed)
 	return priKey, priKey[32:], nil
+}
+
+
+func Sign(privKey, message []byte) []byte {
+	pk := ed25519.PrivateKey(privKey)
+	return ed25519.Sign(pk, message)
 }
 
 func Bech32ifyQOSAccPubkeyFromBase64PubKey(base64pubkey string) (string, error) {

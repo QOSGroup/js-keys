@@ -9,7 +9,7 @@ operation QOS keys
  使用助记词恢复QOS账户公私钥. QOS账户体系中HDPATH为: "44'/389'/0'/0/0"
 
 ```
- let [privKey,pubKey,err] = keys.DeriveQOSKey("助记词...")
+ let [privKey,pubKey,err] = qosKeys.DeriveQOSKey("助记词...")
 ```
 
 *  DeriveKey
@@ -18,10 +18,16 @@ operation QOS keys
 
 
 ```
- let [privKey,pubKey,err] = keys.DeriveKey("助记词...", "hdpath")
+ let [privKey,pubKey,err] = qosKeys.DeriveKey("助记词...", "hdpath")
 
 ```
 
+* Sign
+
+使用私钥对数据进行签名
+```
+
+```
 
 * Bech32ifyQOSAccPubkeyFromBase64PubKey
 * Bech32ifyQOSAccPubkey

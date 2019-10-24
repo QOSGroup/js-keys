@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>test</title>
-    <script type="application/javascript" src="./keys.js" ></script>
+    <script type="application/javascript" src="./qos-keys.js" ></script>
 </head>
 <body>
 
@@ -17,40 +17,41 @@
     let prikeyBz, pubkeyBz, pubkeyBase64, prikeyBase64, pubkeyBech32, addrBz,addrBech32,err;
 
     //从助记词中恢复QOS公私钥
-    [prikeyBz, pubkeyBz, err] = keys.DeriveQOSKey(mnemonic);
+    [prikeyBz, pubkeyBz, err] = qosKeys.DeriveQOSKey(mnemonic);
     if (err != null) {
         console.log(err);
     }
 
     console.log("prikeyBz: " + prikeyBz);
-    console.log("prikeyBase64: " + keys.EncodeBase64(prikeyBz));
+    console.log("prikeyBase64: " + qosKeys.EncodeBase64(prikeyBz));
 
-    pubkeyBase64 = keys.EncodeBase64(pubkeyBz);
+    pubkeyBase64 = qosKeys.EncodeBase64(pubkeyBz);
     console.log("pubkeyBz: " + pubkeyBz);
     console.log("pubkeyBase64: " + pubkeyBase64);
 
 
 
-    [pubkeyBech32, err] =  keys.Bech32ifyQOSAccPubkeyFromBase64PubKey(pubkeyBase64);
+    [pubkeyBech32, err] =  qosKeys.Bech32ifyQOSAccPubkeyFromBase64PubKey(pubkeyBase64);
     console.log("pubkeyBech32(1): " + pubkeyBech32);
 
-    [pubkeyBech32, err] = keys.Bech32ifyQOSAccPubkey(pubkeyBz);
+    [pubkeyBech32, err] = qosKeys.Bech32ifyQOSAccPubKey(pubkeyBz);
     console.log("pubkeyBech32(2): " + pubkeyBech32);
 
 
-    addrBz = keys.AddressFromPubKey(pubkeyBz);
+    addrBz = qosKeys.AddressFromPubKey(pubkeyBz);
 
-    [addrBech32, err] = keys.Bech32ifyQOSAccAddressFromBase64PubKey(pubkeyBase64);
+    [addrBech32, err] = qosKeys.Bech32ifyQOSAccAddressFromBase64PubKey(pubkeyBase64);
     console.log("addrBech32(1):" + addrBech32);
 
-    [addrBech32, err] = keys.Bech32ifyQOSAccAddressFromPubKey(pubkeyBz);
+    [addrBech32, err] = qosKeys.Bech32ifyQOSAccAddressFromPubKey(pubkeyBz);
     console.log("addrBech32(2):" + addrBech32);
 
-    [addrBech32, err] = keys.Bech32ifyQOSAccAddress(addrBz);
+    [addrBech32, err] = qosKeys.Bech32ifyQOSAccAddress(addrBz);
     console.log("addrBech32(3):" + addrBech32);
 
 
-
+    let data = qosKeys.Sign(prikeyBz, pubkeyBz);
+    console.log(data);
 </script>
 
 </html>

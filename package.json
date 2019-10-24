@@ -1,8 +1,8 @@
 {
-  "name": "keys",
+  "name": "qosKeys",
   "version": "1.0.2",
   "description": "operation for QOS keys",
-  "main": "keys.js",
+  "main": "qos-keys.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
