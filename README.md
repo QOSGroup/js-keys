@@ -26,11 +26,11 @@ operation QOS keys
 
 使用私钥对数据进行签名
 ```
-
+    qosKeys.Sign(privateKeyBuffer, messageDataBuffer)
 ```
 
 * Bech32ifyQOSAccPubkeyFromBase64PubKey
-* Bech32ifyQOSAccPubkey
+* Bech32ifyQOSAccPubKey
 
 以QOS Bech32格式显示账户公钥
 
