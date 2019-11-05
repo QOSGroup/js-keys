@@ -1,5 +1,5 @@
 # js-keys
-operation QOS keys
+operate QOS keys
 
 
 ### Methods
