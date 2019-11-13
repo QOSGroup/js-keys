@@ -1,4 +1,4 @@
-module github.com/QOSGroup/keys
+module github.com/QOSGroup/js-keys
 
 go 1.12
 
