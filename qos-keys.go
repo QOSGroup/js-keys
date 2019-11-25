@@ -20,6 +20,7 @@ func main() {
 		"Sign": 								  keys.Sign,
 		"SignBase64Message":                      keys.SignBase64Message,
 		"VerifyBech32String":                     keys.VerifyBech32String,
+		"RecoverFromPrivateKey":                  keys.RecoverFromPrivateKey,
 	})
 }
 

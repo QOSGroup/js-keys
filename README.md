@@ -31,6 +31,28 @@ example:
 
 ```
 
+* RecoverFromPrivateKey
+
+使用私钥恢复账户公私钥及地址信息
+
+```typescript
+function RecoverFromPrivateKey(hexPrivateKey: string): [privateKey: string,pubkey: string,accAddress: string, err: Error]
+```
+
+example:
+
+```typescript
+
+let hexPrivateKey = "BEE8F561D6A09EE3DBB3C1F4BA505B33BF16FFAB9A9C0D4B312762F81C975876943A260CB11EFA8BB4D64E05B0D2C939D535D2B865A41C55411F810304A95337";
+
+ let [hexPrivateKey1, bech32PubKey, bech32Address, err] = qosKeys.RecoverFromPrivateKey(hexPrivateKey);
+
+ if(err != null){
+   console.log(hexPrivateKey1); // BEE8F561D6A09EE3DBB3C1F4BA505B33BF16FFAB9A9C0D4B312762F81C975876943A260CB11EFA8BB4D64E05B0D2C939D535D2B865A41C55411F810304A95337
+   console.log(bech32PubKey); //  qosaccpub1jsazvr93rmaghdxkfczmp5kf882nt54cvkjpc42pr7qsxp9f2vms2evj9l
+   console.log(bech32Address);//  qosacc163m0ww25yld86rrss0vntasn4cs72y5nl9evw3
+ }  
+```
 
 * Sign: 使用私钥对数据进行签名
 

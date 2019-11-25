@@ -14,7 +14,7 @@
 
     let mnemonic = "fury flavor subway start spare hospital tag chief word start pencil borrow town mandate detect pencil cook bridge right scout remain this differ leader";
 
-    let hexPrivateKey,bech32PubKey, bech32Address, err;
+    let hexPrivateKey,bech32PubKey, bech32Address, err,hexPrivateKey2,bech32PubKey2, bech32Address2;
 
     //从助记词中恢复QOS公私钥
     [hexPrivateKey, bech32PubKey, bech32Address, err] = qosKeys.DeriveQOSKey(mnemonic);
@@ -22,6 +22,16 @@
         console.log(hexPrivateKey);
         console.log(bech32PubKey);
         console.log(bech32Address);
+    }else{
+        console.log(err);
+    }
+
+    //从私钥中恢复公私钥及地址
+    [hexPrivateKey2, bech32PubKey2, bech32Address2, err] = qosKeys.RecoverFromPrivateKey(hexPrivateKey);
+    if (err == null) {
+        console.log(hexPrivateKey2);
+        console.log(bech32PubKey2);
+        console.log(bech32Address2);
     }else{
         console.log(err);
     }

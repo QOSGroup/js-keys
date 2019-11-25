@@ -20,16 +20,31 @@ import (
 )
 
 func DeriveQOSKey(mnemonic string) (hexPrivateKey string, bech32PubKey string, bech32AccAddress string,err error) {
-	priKey, pubKey, err := deriveKey(mnemonic, "44'/389'/0'/0/0")
+	priKeyBz, pubKeyBz, err := deriveKey(mnemonic, "44'/389'/0'/0/0")
 	if err != nil {
 		return "", "", "", err
 	}
 
-	hexPrivateKey = strings.ToUpper(hex.EncodeToString(priKey))
-	bech32PubKey, _ = Bech32ifyQOSAccPubKey(pubKey)
-	bech32AccAddress , _ = Bech32ifyQOSAccAddressFromPubKey(pubKey)
+	hexPrivateKey = strings.ToUpper(hex.EncodeToString(priKeyBz))
+	bech32PubKey, _ = Bech32ifyQOSAccPubKey(pubKeyBz)
+	bech32AccAddress , _ = Bech32ifyQOSAccAddressFromPubKey(pubKeyBz)
 	return
 }
+
+func RecoverFromPrivateKey(hexPK string) (hexPrivateKey string, bech32PubKey string, bech32AccAddress string,err error)  {
+
+	priKeyBz, err := hex.DecodeString(hexPK)
+	if err != nil {
+		return "","","",err
+	}
+	pubKeyBz := priKeyBz[32:]
+
+	hexPrivateKey = strings.ToUpper(hex.EncodeToString(priKeyBz))
+	bech32PubKey, _ = Bech32ifyQOSAccPubKey(pubKeyBz)
+	bech32AccAddress , _ = Bech32ifyQOSAccAddressFromPubKey(pubKeyBz)
+	return
+}
+
 
 func deriveKey(mnemonic, hdpath string) (priKeyBz []byte, pubKeyBz []byte, err error) {
 	seed, err := bip39.NewSeedWithErrorChecking(mnemonic, "")
