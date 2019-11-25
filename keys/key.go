@@ -6,6 +6,7 @@ import (
 	"crypto/sha512"
 	"encoding/base64"
 	"encoding/binary"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"golang.org/x/crypto/ed25519"
@@ -18,11 +19,19 @@ import (
 	"github.com/tyler-smith/go-bip39"
 )
 
-func DeriveQOSKey(mnemonic string) ([]byte, []byte, error) {
-	return DeriveKey(mnemonic, "44'/389'/0'/0/0")
+func DeriveQOSKey(mnemonic string) (hexPrivateKey string, bech32PubKey string, bech32AccAddress string,err error) {
+	priKey, pubKey, err := deriveKey(mnemonic, "44'/389'/0'/0/0")
+	if err != nil {
+		return "", "", "", err
+	}
+
+	hexPrivateKey = strings.ToUpper(hex.EncodeToString(priKey))
+	bech32PubKey, _ = Bech32ifyQOSAccPubKey(pubKey)
+	bech32AccAddress , _ = Bech32ifyQOSAccAddressFromPubKey(pubKey)
+	return
 }
 
-func DeriveKey(mnemonic, hdpath string) (priKeyBz []byte, pubKeyBz []byte, err error) {
+func deriveKey(mnemonic, hdpath string) (priKeyBz []byte, pubKeyBz []byte, err error) {
 	seed, err := bip39.NewSeedWithErrorChecking(mnemonic, "")
 	if err != nil {
 		return nil, nil, err
@@ -43,9 +52,17 @@ func DeriveKey(mnemonic, hdpath string) (priKeyBz []byte, pubKeyBz []byte, err e
 }
 
 
-func Sign(privKey, message []byte) []byte {
-	pk := ed25519.PrivateKey(privKey)
-	return ed25519.Sign(pk, message)
+func Sign(hexPrivateKey, message string) []byte {
+	bz, _ := hex.DecodeString(hexPrivateKey)
+	pk := ed25519.PrivateKey(bz)
+	return ed25519.Sign(pk, []byte(message))
+}
+
+func SignBase64Message(hexPrivateKey, base64Message string) []byte {
+	bz, _ := hex.DecodeString(hexPrivateKey)
+	pk := ed25519.PrivateKey(bz)
+	data, _:= base64.StdEncoding.DecodeString(base64Message)
+	return ed25519.Sign(pk, data)
 }
 
 func Bech32ifyQOSAccPubkeyFromBase64PubKey(base64pubkey string) (string, error) {
@@ -76,12 +93,17 @@ func Bech32ifyQOSAccAddress(addr []byte) (string, error) {
 	return ConvertAndEncode("qosacc", addr)
 }
 
+func VerifyBech32String(addr string) bool {
+	_, _, err := bech32.Decode(addr)
+	return err == nil
+}
+
 func DecodeBase64(str string) ([]byte, error) {
 	return base64.StdEncoding.DecodeString(str)
 }
 
-func EncodeBase64(bz []byte) string {
-	return base64.StdEncoding.EncodeToString(bz)
+func EncodeBase64(originData string) string {
+	return base64.StdEncoding.EncodeToString([]byte(originData))
 }
 
 func ConvertAndEncode(hrp string, data []byte) (string, error) {
@@ -90,7 +112,6 @@ func ConvertAndEncode(hrp string, data []byte) (string, error) {
 		return "", errors.New("encoding bech32 failed")
 	}
 	return bech32.Encode(hrp, converted)
-
 }
 
 func AddressFromPubKey(bz []byte) []byte {

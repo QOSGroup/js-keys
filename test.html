@@ -14,44 +14,33 @@
 
     let mnemonic = "fury flavor subway start spare hospital tag chief word start pencil borrow town mandate detect pencil cook bridge right scout remain this differ leader";
 
-    let prikeyBz, pubkeyBz, pubkeyBase64, prikeyBase64, pubkeyBech32, addrBz,addrBech32,err;
+    let hexPrivateKey,bech32PubKey, bech32Address, err;
 
     //从助记词中恢复QOS公私钥
-    [prikeyBz, pubkeyBz, err] = qosKeys.DeriveQOSKey(mnemonic);
-    if (err != null) {
+    [hexPrivateKey, bech32PubKey, bech32Address, err] = qosKeys.DeriveQOSKey(mnemonic);
+    if (err == null) {
+        console.log(hexPrivateKey);
+        console.log(bech32PubKey);
+        console.log(bech32Address);
+    }else{
         console.log(err);
     }
 
-    console.log("prikeyBz: " + prikeyBz);
-    console.log("prikeyBase64: " + qosKeys.EncodeBase64(prikeyBz));
 
-    pubkeyBase64 = qosKeys.EncodeBase64(pubkeyBz);
-    console.log("pubkeyBz: " + pubkeyBz);
-    console.log("pubkeyBase64: " + pubkeyBase64);
+    //对字符串及对base64编码的字符串签名
+    let message = "你好,QOS钱包";
+    let base64Message = qosKeys.EncodeBase64(message);
 
+    let signData1 = qosKeys.Sign(hexPrivateKey, message);
+    let signData2 = qosKeys.SignBase64Message(hexPrivateKey, base64Message);
 
+    console.log(signData1);
+    console.log(signData2);
+    console.log(qosKeys.EncodeBase64(signData1) === qosKeys.EncodeBase64(signData2));
 
-    [pubkeyBech32, err] =  qosKeys.Bech32ifyQOSAccPubkeyFromBase64PubKey(pubkeyBase64);
-    console.log("pubkeyBech32(1): " + pubkeyBech32);
-
-    [pubkeyBech32, err] = qosKeys.Bech32ifyQOSAccPubKey(pubkeyBz);
-    console.log("pubkeyBech32(2): " + pubkeyBech32);
-
-
-    addrBz = qosKeys.AddressFromPubKey(pubkeyBz);
-
-    [addrBech32, err] = qosKeys.Bech32ifyQOSAccAddressFromBase64PubKey(pubkeyBase64);
-    console.log("addrBech32(1):" + addrBech32);
-
-    [addrBech32, err] = qosKeys.Bech32ifyQOSAccAddressFromPubKey(pubkeyBz);
-    console.log("addrBech32(2):" + addrBech32);
-
-    [addrBech32, err] = qosKeys.Bech32ifyQOSAccAddress(addrBz);
-    console.log("addrBech32(3):" + addrBech32);
-
-
-    let data = qosKeys.Sign(prikeyBz, pubkeyBz);
-    console.log(data);
+    //校验bech32格式字符串是否合法
+    console.log(qosKeys.VerifyBech32String(bech32PubKey));
+    console.log(qosKeys.VerifyBech32String(bech32Address));
 </script>
 
 </html>
