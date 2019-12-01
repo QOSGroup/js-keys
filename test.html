@@ -29,7 +29,7 @@
     }
 
     //从私钥中恢复公私钥及地址
-    [hexPrivateKey2, bech32PubKey2, bech32Address2, err] = qosKeys.RecoverFromPrivateKey(hexPrivateKey);
+    [hexPrivateKey2, bech32PubKey2, bech32Address2, privateKeyBz, publicKeyBz,err] = qosKeys.RecoverFromPrivateKey(hexPrivateKey);
     if (err == null) {
         console.log(hexPrivateKey2);
         console.log(bech32PubKey2);

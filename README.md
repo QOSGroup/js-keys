@@ -10,7 +10,7 @@ operate QOS keys
 
 使用助记词恢复QOS账户公私钥. QOS账户体系中HDPATH为: "44'/389'/0'/0/0"
 
-私钥为16进制编码的字符串, 公钥为bech32格式的字符串, 用户地址为bech32格式的字符串
+privateKey为16进制编码的字符串, pubkey为bech32格式的字符串, accAddress为bech32格式的字符串
 
 
 ```typescript
@@ -38,7 +38,7 @@ example:
 使用私钥恢复账户公私钥及地址信息
 
 ```typescript
-function RecoverFromPrivateKey(hexPrivateKey: string): [privateKey: string,pubkey: string,accAddress: string, err: Error]
+function RecoverFromPrivateKey(hexPrivateKey: string): [privateKey: string,pubkey: string,accAddress: string, privateKeyBz: Uint8Array,pubKeyBz: Uint8Array,err: Error]
 ```
 
 example:
@@ -47,12 +47,14 @@ example:
 
 let hexPrivateKey = "BEE8F561D6A09EE3DBB3C1F4BA505B33BF16FFAB9A9C0D4B312762F81C975876943A260CB11EFA8BB4D64E05B0D2C939D535D2B865A41C55411F810304A95337";
 
- let [hexPrivateKey1, bech32PubKey, bech32Address, err] = qosKeys.RecoverFromPrivateKey(hexPrivateKey);
+ let [hexPrivateKey1, bech32PubKey, bech32Address, privateKeyBz, pubKeyBz, err] = qosKeys.RecoverFromPrivateKey(hexPrivateKey);
 
  if(err != null){
    console.log(hexPrivateKey1); // BEE8F561D6A09EE3DBB3C1F4BA505B33BF16FFAB9A9C0D4B312762F81C975876943A260CB11EFA8BB4D64E05B0D2C939D535D2B865A41C55411F810304A95337
    console.log(bech32PubKey); //  qosaccpub1jsazvr93rmaghdxkfczmp5kf882nt54cvkjpc42pr7qsxp9f2vms2evj9l
    console.log(bech32Address);//  qosacc163m0ww25yld86rrss0vntasn4cs72y5nl9evw3
+   console.log(privateKeyBz);
+   console.log(pubKeyBz); 
  }  
 ```
 

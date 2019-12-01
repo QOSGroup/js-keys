@@ -31,13 +31,13 @@ func DeriveQOSKey(mnemonic string) (hexPrivateKey, bech32PubKey, bech32AccAddres
 	return
 }
 
-func RecoverFromPrivateKey(hexPK string) (hexPrivateKey string, bech32PubKey string, bech32AccAddress string,err error)  {
+func RecoverFromPrivateKey(hexPK string) (hexPrivateKey, bech32PubKey, bech32AccAddress string, priKeyBz, pubKeyBz []byte,err error)  {
 
-	priKeyBz, err := hex.DecodeString(hexPK)
+	priKeyBz, err = hex.DecodeString(hexPK)
 	if err != nil {
-		return "","","",err
+		return "","","",nil, nil, err
 	}
-	pubKeyBz := priKeyBz[32:]
+	pubKeyBz = priKeyBz[32:]
 
 	hexPrivateKey = strings.ToUpper(hex.EncodeToString(priKeyBz))
 	bech32PubKey, _ = Bech32ifyQOSAccPubKey(pubKeyBz)
