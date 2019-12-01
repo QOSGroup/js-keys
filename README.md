@@ -92,7 +92,7 @@ console.log(signedData); //Uint8Array(64) [246, 14, 144, 150, 177, 6, 5, 1, 13,
 * EncodeBase64: base64编码
 
 ```typescript
-function EncodeBase64(buffer: Uint8Array | string): string
+function EncodeBase64(buffer: Uint8Array): string
 ```
 
 example: 
@@ -101,10 +101,6 @@ example:
 let buffer = Uint8Array.from([148, 58, 38, 12, 177, 30, 250, 139, 180, 214, 78, 5, 176, 210, 201, 57, 213, 53, 210, 184, 101, 164, 28, 85, 65, 31, 129, 3, 4, 169, 83, 55]);
 let base64Str = qosKeys.EncodeBase64(buffer);
 console.log(base64Str); //lDomDLEe+ou01k4FsNLJOdU10rhlpBxVQR+BAwSpUzc=
-
-let str = "你好,QOS钱包";
-console.log(qosKeys.EncodeBase64(str)); //5L2g5aW9LFFPU+mSseWMhQ==
-
 
 ```
 

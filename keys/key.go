@@ -117,8 +117,8 @@ func DecodeBase64(str string) ([]byte, error) {
 	return base64.StdEncoding.DecodeString(str)
 }
 
-func EncodeBase64(originData string) string {
-	return base64.StdEncoding.EncodeToString([]byte(originData))
+func EncodeBase64(originData []byte) string {
+	return base64.StdEncoding.EncodeToString(originData)
 }
 
 func ConvertAndEncode(hrp string, data []byte) (string, error) {
