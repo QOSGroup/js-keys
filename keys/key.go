@@ -19,10 +19,10 @@ import (
 	"github.com/tyler-smith/go-bip39"
 )
 
-func DeriveQOSKey(mnemonic string) (hexPrivateKey string, bech32PubKey string, bech32AccAddress string,err error) {
-	priKeyBz, pubKeyBz, err := deriveKey(mnemonic, "44'/389'/0'/0/0")
+func DeriveQOSKey(mnemonic string) (hexPrivateKey, bech32PubKey, bech32AccAddress string,priKeyBz, pubKeyBz []byte, err error) {
+	priKeyBz, pubKeyBz, err = deriveKey(mnemonic, "44'/389'/0'/0/0")
 	if err != nil {
-		return "", "", "", err
+		return "", "", "", nil, nil, err
 	}
 
 	hexPrivateKey = strings.ToUpper(hex.EncodeToString(priKeyBz))

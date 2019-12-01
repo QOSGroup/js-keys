@@ -14,19 +14,21 @@ operate QOS keys
 
 
 ```typescript
-function DeriveQOSKey(mnemonic: string): [privateKey: string,pubkey: string,accAddress: string, err: Error]
+function DeriveQOSKey(mnemonic: string): [privateKey: string,pubkey: string,accAddress: string, privateKeyBz: Uint8Array,pubKeyBz: Uint8Array,err: Error]
 ```
 
 example: 
 
 ```typescript
  let mnemonic = "fury flavor subway start spare hospital tag chief word start pencil borrow town mandate detect pencil cook bridge right scout remain this differ leader";
- let [hexPrivateKey, bech32PubKey, bech32Address, err] = qosKeys.DeriveQOSKey(mnemonic);
+ let [hexPrivateKey, bech32PubKey, bech32Address, privateKeyBz, pubKeyBz, err] = qosKeys.DeriveQOSKey(mnemonic);
 
  if(err != null){
    console.log(hexPrivateKey); // BEE8F561D6A09EE3DBB3C1F4BA505B33BF16FFAB9A9C0D4B312762F81C975876943A260CB11EFA8BB4D64E05B0D2C939D535D2B865A41C55411F810304A95337
    console.log(bech32PubKey); //  qosaccpub1jsazvr93rmaghdxkfczmp5kf882nt54cvkjpc42pr7qsxp9f2vms2evj9l
    console.log(bech32Address);//  qosacc163m0ww25yld86rrss0vntasn4cs72y5nl9evw3
+   console.log(privateKeyBz);
+   console.log(pubKeyBz); 
  }  
 
 ```
